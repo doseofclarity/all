@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Acute Lymphocytic Leukemia (ALL) in Children | MCN Review | Pillitteri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fecaca;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #b91c1c; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .locked-section { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+        .flashcard { background: #fff; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; border: 1px solid #e2e8f0; }
+        .flashcard:hover { transform: translateY(-5px); }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { all: { light: '#fef2f2', DEFAULT: '#b91c1c', dark: '#991b1b' } } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-all-dark text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none">
+            <i class="fa-solid fa-droplet mr-2"></i> Childhood ALL
+        </h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-all-dark to-all text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-regular fa-hand-peace mr-2"></i> Acute Lymphocytic Leukemia</h1>
+            <p class="text-sm text-red-200 mt-1 font-medium">Pediatric Hematology · MCN · Pillitteri</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-all-light text-all-dark border-r-4 border-all-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden"></i> Home / Start</button></li>
+                <li><button onclick="showSection('definition')" id="btn-definition" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-book-open w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Definition & Epidemiology</button></li>
+                <li><button onclick="showSection('etiology')" id="btn-etiology" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-chart-line w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Etiology & Risk Factors</button></li>
+                <li><button onclick="showSection('pathophysiology')" id="btn-pathophysiology" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-notes-medical w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Pathophysiology & Classification</button></li>
+                <li><button onclick="showSection('clinical')" id="btn-clinical" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-stethoscope w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Clinical Presentation & Diagnosis</button></li>
+                <li><button onclick="showSection('treatment')" id="btn-treatment" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-capsules w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Treatment (Chemotherapy, CNS Prophylaxis, Transplant)</button></li>
+                <li><button onclick="showSection('nursing')" id="btn-nursing" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-user-nurse w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Nursing Care & Complications</button></li>
+                <li><button onclick="showSection('prognosis')" id="btn-prognosis" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-chart-simple w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Prognosis & Long‑Term Follow‑Up</button></li>
+                <li><button onclick="showSection('flashcards')" id="btn-flashcards" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-cards w-6 text-all nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Flashcards & Mnemonics</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-all mr-1"></i> Active Recall</span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-800 to-all-dark text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-droplet text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-red-300 mb-6 shadow-sm border border-white/20">
+                            <i class="fa-solid fa-book-open text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-300 mb-2 uppercase tracking-widest">Maternal & Child Health Nursing</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">Acute Lymphocytic Leukemia in Children</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">Epidemiology · Diagnosis · Treatment · Nursing Care | <strong>Adele Pillitteri, 7e</strong></p>
+                        </div>
+                        <button onclick="unlockFirstSection()" class="bg-slate-600 hover:bg-slate-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">
+                            Begin Module <i class="fa-solid fa-arrow-right ml-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1. DEFINITION & EPIDEMIOLOGY -->
+            <section id="definition" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-book-open text-all mr-4"></i> Definition & Epidemiology</h2>
+                    <p><strong>Acute Lymphocytic Leukemia (ALL)</strong> – a malignant clonal disease characterized by uncontrolled proliferation of immature lymphoid cells (lymphoblasts) in the bone marrow, blood, and extramedullary sites. It is the most common pediatric cancer, accounting for ~75% of leukemias in children under 15 years[reference:0].</p>
+                    <div class="grid md:grid-cols-2 gap-5 mt-4">
+                        <div class="bg-slate-50 p-4 rounded-xl"><strong>📊 Global & Philippines Incidence</strong><br><span class="reveal-text">ALL incidence ~3.3 per 100,000 children[reference:1]. In the Philippines, acute leukemia (ALL + AML) accounts for 47.8% of pediatric malignancies, with an incidence of 109 per 100,000[reference:2].</span></div>
+                        <div class="bg-slate-50 p-4 rounded-xl"><strong>📌 Age & Sex Distribution</strong><br><span class="reveal-text">Peak incidence 2–5 years; male > female (slightly). 60% of ALL occurs in children; second peak after age 50[reference:3]. In the Philippines, 64.6% of ALL patients are male, mean age 6.4±4.4 years[reference:4].</span></div>
+                    </div>
+                    <canvas id="allChart" width="400" height="200" style="max-width:100%; margin-top:1rem;"></canvas>
+                    <div class="bg-amber-50 p-3 rounded-lg mt-4"><strong>⚠️ Key point:</strong> Approximately 3,500 new leukemia cases are diagnosed annually in the Philippines, equivalent to 10 children diagnosed with cancer per day[reference:5].</div>
+                    <button onclick="openQuiz('definition')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 2. ETIOLOGY & RISK FACTORS -->
+            <section id="etiology" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-chart-line text-all mr-4"></i> Etiology & Risk Factors</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="bg-red-50 p-4 rounded-xl"><strong>⚠️ Genetic & Hereditary Factors</strong><br><span class="reveal-text">• Down syndrome (highest risk)<br>• Li‑Fraumeni, neurofibromatosis, Fanconi anemia, ataxia telangiectasia<br>• Somatic polymorphisms: ARID5B, IKZF1, CDKN2A[reference:6]<br>• Germline PAX5, ETV6, TP53 mutations[reference:7]</span></div>
+                        <div class="bg-blue-50 p-4 rounded-xl"><strong>🌍 Environmental & Other Factors</strong><br><span class="reveal-text">• Ionizing radiation exposure<br>• Benzene, pesticides<br>• Previous chemotherapy/radiotherapy<br>• Epstein‑Barr virus, HIV<br>• Male sex, Hispanic ethnicity[reference:8]<br>• Age (peak 2‑5 years)</span></div>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded-lg mt-4"><strong>📌 Most cases are sporadic (acquired mutations), not inherited.</strong> <span class="reveal-text">The exact cause remains unknown in most children[reference:9].</span></div>
+                    <button onclick="openQuiz('etiology')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 3. PATHOPHYSIOLOGY & CLASSIFICATION -->
+            <section id="pathophysiology" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-notes-medical text-all mr-4"></i> Pathophysiology & Classification</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Pathophysiology:</strong> <span class="reveal-text">Acquired genetic mutations in lymphoid progenitor cells → uncontrolled proliferation of lymphoblasts (>20% in bone marrow) → crowding out normal hematopoiesis → anemia, neutropenia, thrombocytopenia. Extramedullary infiltration (CNS, testes, lymph nodes, liver, spleen) is common[reference:10].</span></li>
+                        <li><strong>Immunophenotypic subtypes (Philippines data):</strong> <span class="reveal-text">B‑ALL 90%, T‑ALL 10%[reference:11]. In B‑ALL, CD19 (96%), CD10 (96%), cCD79a (97%), cTdT (96%) expression is typical[reference:12].</span></li>
+                        <li><strong>Genetic subgroups (WHO 5th edition):</strong> <span class="reveal-text">Hyperdiploidy (favorable), t(12;21) ETV6‑RUNX1 (favorable), t(9;22) BCR‑ABL1 (Philadelphia chromosome, poor prognosis), KMT2A rearrangements (infant ALL, poor), iAMP21, hypodiploidy[reference:13].</span></li>
+                    </ul>
+                    <div class="bg-amber-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-lightbulb"></i> <strong>Philadelphia chromosome (t(9;22))</strong> is present in ~3‑5% of pediatric ALL, historically poor prognosis, now treatable with tyrosine kinase inhibitors.</div>
+                    <button onclick="openQuiz('pathophysiology')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 4. CLINICAL PRESENTATION & DIAGNOSIS -->
+            <section id="clinical" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-stethoscope text-all mr-4"></i> Clinical Presentation & Diagnosis</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="bg-red-50 p-4 rounded-xl"><strong>🩸 Signs & Symptoms (due to cytopenias)</strong><br><span class="reveal-text">• Fatigue, pallor (anemia)<br>• Fever, recurrent infections (neutropenia)<br>• Easy bruising, petechiae, bleeding (thrombocytopenia)<br>• Bone/joint pain<br>• Lymphadenopathy, hepatosplenomegaly<br>• CNS signs: headache, vomiting, papilledema (if CNS involvement)</span></div>
+                        <div class="bg-blue-50 p-4 rounded-xl"><strong>🔬 Diagnostic Workup</strong><br><span class="reveal-text">• CBC with differential: anemia, thrombocytopenia, WBC may be low, normal, or high. Blasts on peripheral smear (57% of cases)[reference:14].<br>• Bone marrow aspiration & biopsy: >20% lymphoblasts.<br>• Immunophenotyping (flow cytometry): confirms lineage (B‑ALL vs T‑ALL).<br>• Cytogenetics & molecular: karyotype, FISH, RT‑PCR for fusion genes.[reference:15]<br>• Lumbar puncture: assess CNS involvement.<br>• Chemistry panel: LDH, uric acid (tumor lysis).</span></div>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-flask"></i> <strong>Key laboratory clue:</strong> <span class="reveal-text">Elevated LDH, hyperuricemia, and cytopenias with blasts.</span></div>
+                    <button onclick="openQuiz('clinical')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 5. TREATMENT (CHEMOTHERAPY, CNS PROPHYLAXIS, TRANSPLANT) -->
+            <section id="treatment" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-capsules text-all mr-4"></i> Treatment (Chemotherapy, CNS Prophylaxis, Transplant)</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>💊 Chemotherapy (3 phases)</strong><br><span class="reveal-text">• <strong>Induction (4‑6 weeks):</strong> achieve remission (target <5% blasts). Drugs: vincristine, glucocorticoids, anthracycline, asparaginase.<br>• <strong>Consolidation (intensification):</strong> eliminate residual disease. High‑dose methotrexate, cytarabine, etc.<br>• <strong>Maintenance:</strong> daily oral mercaptopurine, weekly methotrexate for 2‑3 years to prevent relapse[reference:16].</span></div>
+                        <div><strong>🧠 CNS Prophylaxis</strong><br><span class="reveal-text">• Intrathecal chemotherapy (methotrexate, cytarabine, hydrocortisone) to prevent CNS relapse.<br>• Cranial irradiation (reserved for high‑risk or overt CNS disease). Improves CNS control[reference:17].</span></div>
+                        <div><strong>🩸 Targeted therapy & immunotherapy</strong><br><span class="reveal-text">• Tyrosine kinase inhibitors (imatinib, dasatinib) for Ph+ ALL.<br>• Blinatumomab (bispecific T‑cell engager), inotuzumab ozogamicin, CAR T‑cell therapy (tisagenlecleucel) for relapsed/refractory ALL.</span></div>
+                        <div><strong>💉 Hematopoietic stem cell transplant (HSCT)</strong><br><span class="reveal-text">• Allogeneic transplant considered for high‑risk or relapsed patients (e.g., Ph+ ALL, hypodiploidy, poor early response).</span></div>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-clock"></i> <strong>Supportive care:</strong> infection prevention (antibiotics, antifungals), transfusions, hydration/rasburicase for tumor lysis, growth factors.</div>
+                    <button onclick="openQuiz('treatment')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 6. NURSING CARE & COMPLICATIONS -->
+            <section id="nursing" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-user-nurse text-all mr-4"></i> Nursing Care & Complications</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Infection prevention:</strong> <span class="reveal-text">Hand hygiene, reverse isolation during neutropenia, monitor for fever, administer prophylactic antibiotics/antifungals, educate on signs of sepsis.</span></li>
+                        <li><strong>Bleeding precautions:</strong> <span class="reveal-text">Soft toothbrush, avoid IM injections, use pressure after venipuncture, monitor platelets (transfuse if <10,000 or bleeding).</span></li>
+                        <li><strong>Nutritional support:</strong> <span class="reveal-text">Manage nausea/vomiting (antiemetics), mucositis (oral care), maintain hydration, consider TPN if severe.</span></li>
+                        <li><strong>Tumor lysis syndrome (TLS) monitoring:</strong> <span class="reveal-text">Monitor uric acid, potassium, phosphorus, calcium, urine output; administer allopurinol/rasburicase, IV fluids.</span></li>
+                        <li><strong>Psychosocial support:</strong> <span class="reveal-text">Age‑appropriate education, play therapy, school re‑entry, support groups for parents, palliative care when needed.</span></li>
+                        <li><strong>Long‑term follow‑up:</strong> <span class="reveal-text">Monitor for late effects (cardiotoxicity, secondary cancers, neurocognitive deficits, endocrinopathies).[reference:18]</span></li>
+                    </ul>
+                    <div class="bg-pink-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-heart"></i> <strong>Mnemonic “C.A.R.E.”</strong> – Chemotherapy side effects, Assess for bleeding/infection, Reduce tumor lysis risk, Educate family.</div>
+                    <button onclick="openQuiz('nursing')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 7. PROGNOSIS & LONG‑TERM FOLLOW‑UP -->
+            <section id="prognosis" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-chart-simple text-all mr-4"></i> Prognosis & Long‑Term Follow‑Up</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>5‑year overall survival (childhood ALL):</strong> <span class="reveal-text">~90‑94% in high‑income countries[reference:19][reference:20]. Survival has improved from 10% in the 1970s to >86% overall[reference:21].</span></li>
+                        <li><strong>Prognostic factors:</strong> <span class="reveal-text">• Favorable: age 1‑9 years, WBC <50,000, hyperdiploidy, t(12;21)<br>• Unfavorable: infant ALL (<1 year), WBC >50,000, hypodiploidy, Ph+ ALL, KMT2A rearrangement, poor early response to induction.</span></li>
+                        <li><strong>Relapse risk:</strong> <span class="reveal-text">~15‑20% of children relapse; CNS relapse <5% with modern prophylaxis[reference:22]. Relapse treatment includes chemotherapy, immunotherapy, HSCT.</span></li>
+                        <li><strong>Late effects of treatment:</strong> <span class="reveal-text">Neurocognitive deficits, cardiomyopathy (anthracyclines), endocrine dysfunction (growth hormone deficiency, hypothyroidism, infertility), secondary malignancies (especially CNS irradiation)[reference:23].</span></li>
+                        <li><strong>Long‑term monitoring:</strong> <span class="reveal-text">Survivorship clinic – cardiac evaluation, endocrine assessment, neuropsychological testing, education on healthy lifestyle, prevention of second cancers.</span></li>
+                    </ul>
+                    <div class="bg-green-50 p-3 rounded-lg mt-4"><strong>🌟 Hope for families:</strong> <span class="reveal-text">With modern risk‑adapted therapy, most children with ALL become long‑term survivors and lead productive lives.</span></div>
+                    <button onclick="openQuiz('prognosis')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 8. FLASHCARDS & MNEMONICS -->
+            <section id="flashcards" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-all pb-3"><i class="fa-solid fa-cards text-all mr-4"></i> Flashcards & Mnemonics</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-all">Q: What does ALL stand for?</div><div class="flash-answer hidden mt-2">Acute Lymphocytic Leukemia (or Acute Lymphoblastic Leukemia)</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-all">Q: Most common childhood cancer?</div><div class="flash-answer hidden mt-2">ALL (75% of pediatric leukemias)</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-all">Q: Peak age incidence?</div><div class="flash-answer hidden mt-2">2–5 years</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-all">Q: Most common cytogenetic abnormality in pediatric ALL?</div><div class="flash-answer hidden mt-2">Hyperdiploidy & t(12;21) (ETV6-RUNX1) – favorable prognosis</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-all">Q: How is CNS prophylaxis given?</div><div class="flash-answer hidden mt-2">Intrathecal chemotherapy (methotrexate, cytarabine, hydrocortisone)</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-all">Q: Current 5‑year survival for childhood ALL?</div><div class="flash-answer hidden mt-2">~90‑94%</div></div>
+                    </div>
+                    <div class="mt-6 bg-red-50 p-4 rounded-xl"><strong>🧠 Mnemonics</strong><br><span class="reveal-text">“ALL” – Acute Lymphoblastic Leukemia.<br>“C.A.R.E.” – Chemotherapy side effects, Assess for bleeding/infection, Reduce tumor lysis risk, Educate family.<br>“F.A.B.” – French‑American‑British classification of ALL (L1, L2, L3).<br>“N.I.H.” – Non‑irradiated, Intrathecal therapy, High‑risk groups (CNS prophylaxis).</span></div>
+                    <button onclick="openQuiz('flashcards')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Final Exam</button>
+                </div>
+            </section>
+
+            <!-- FINAL EXAM SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-500 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Final 50‑Item Exam: Childhood ALL</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">Covers definition, epidemiology, etiology, pathophysiology, clinical features, diagnosis, treatment, nursing care, prognosis, and mnemonics. Score ≥75% to pass.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md text-xl">Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <div id="quiz-questions-container" class="space-y-4 mt-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-all text-white font-bold py-4 rounded-xl shadow-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100"></div>
+        </div>
+    </div>
+
+    <script>
+        let unlockedSections = ['home'];
+        // QUIZZES (10 questions each)
+        const quizzes = {
+            definition: { title: "Definition & Epidemiology", next: "etiology", questions: [
+                { q: "Acute Lymphocytic Leukemia (ALL) is a malignancy of:", options: ["Lymphoid progenitor cells", "Myeloid cells", "Erythrocytes", "Megakaryocytes"], ans: 0 },
+                { q: "Approximately what percentage of leukemias in children <15 years is ALL?", options: ["50%", "75%", "90%", "30%"], ans: 1 },
+                { q: "Peak age incidence of childhood ALL is:", options: ["6–12 months", "2–5 years", "10–12 years", "Adolescence"], ans: 1 },
+                { q: "In the Philippines, acute leukemia accounts for what percentage of pediatric malignancies?", options: ["25%", "47.8%", "60%", "80%"], ans: 1 },
+                { q: "Which sex has a slightly higher incidence of ALL?", options: ["Male", "Female", "Equal", "Depends on age"], ans: 0 },
+                { q: "Approximately how many new leukemia cases are diagnosed in the Philippines each year?", options: ["1,000", "3,500", "10,000", "20,000"], ans: 1 },
+                { q: "The second peak of ALL incidence occurs after age:", options: ["30", "40", "50", "60"], ans: 2 },
+                { q: "ALL is more common in which racial/ethnic group?", options: ["Non‑Hispanic white", "Hispanic", "Asian", "African American"], ans: 1 },
+                { q: "Mean age of ALL diagnosis in a Philippine study was:", options: ["3.2 years", "6.4 years", "8.7 years", "10.1 years"], ans: 1 },
+                { q: "ALL accounts for approximately what percentage of all cancers in children?", options: ["10%", "25%", "50%", "75%"], ans: 1 }
+            ]},
+            etiology: { title: "Etiology & Risk Factors", next: "pathophysiology", questions: [
+                { q: "Which genetic syndrome carries the highest risk for ALL?", options: ["Down syndrome", "Turner syndrome", "Klinefelter syndrome", "Marfan syndrome"], ans: 0 },
+                { q: "Most cases of ALL are due to:", options: ["Inherited mutations", "Acquired (somatic) mutations", "Viral infection only", "Environmental toxin alone"], ans: 1 },
+                { q: "Exposure to which chemical is a known risk factor for ALL?", options: ["Benzene", "Ethanol", "Acetaminophen", "Caffeine"], ans: 0 },
+                { q: "Which polymorphism is associated with increased ALL risk in Hispanic populations?", options: ["ARID5B", "BRCA1", "CFTR", "HBB"], ans: 0 },
+                { q: "Ionizing radiation exposure is a risk factor for ALL. True or false?", options: ["True", "False"], ans: 0 },
+                { q: "Which of the following viruses may increase ALL risk?", options: ["Epstein‑Barr virus (EBV)", "Influenza", "RSV", "Rotavirus"], ans: 0 },
+                { q: "ALL risk is higher in children with:", options: ["High birth weight", "Low birth weight", "Maternal smoking", "Breastfeeding"], ans: 0 },
+                { q: "Which genetic syndrome is NOT associated with increased ALL risk?", options: ["Li‑Fraumeni", "Neurofibromatosis type 1", "Cystic fibrosis", "Fanconi anemia"], ans: 2 },
+                { q: "Previous treatment with chemotherapy or radiation increases risk for:", options: ["Therapy‑related ALL", "No risk", "B‑ALL only", "T‑ALL only"], ans: 0 },
+                { q: "The exact cause of ALL in most children is:", options: ["Unknown", "Maternal diet", "Vaccines", "Pesticides alone"], ans: 0 }
+            ]},
+            pathophysiology: { title: "Pathophysiology & Classification", next: "clinical", questions: [
+                { q: "The hallmark laboratory finding in ALL is:", options: [">20% lymphoblasts in bone marrow", ">50% myeloblasts", "Decreased lymphocytes", "Increased eosinophils"], ans: 0 },
+                { q: "Most common immunophenotype of ALL in children is:", options: ["B‑ALL", "T‑ALL", "Null‑ALL", "Mixed phenotype"], ans: 0 },
+                { q: "In a Philippine cohort, what percentage of ALL was B‑ALL?", options: ["70%", "80%", "90%", "95%"], ans: 2 },
+                { q: "Which translocation is associated with favorable prognosis in childhood B‑ALL?", options: ["t(9;22)", "t(12;21)", "t(4;11)", "t(1;19)"], ans: 1 },
+                { q: "Philadelphia chromosome (t(9;22)) creates which fusion gene?", options: ["BCR‑ABL1", "ETV6‑RUNX1", "KMT2A‑MLLT1", "TCF3‑PBX1"], ans: 0 },
+                { q: "Which genetic finding is associated with poor prognosis in infant ALL?", options: ["KMT2A rearrangement", "Hyperdiploidy", "ETV6‑RUNX1", "t(12;21)"], ans: 0 },
+                { q: "Hypodiploidy (fewer than 44 chromosomes) is a:", options: ["Favorable feature", "Unfavorable feature", "Normal", "Only in T‑ALL"], ans: 1 },
+                { q: "CD19 and CD10 expression is characteristic of:", options: ["B‑ALL", "T‑ALL", "Myeloid leukemia", "Megakaryoblastic leukemia"], ans: 0 },
+                { q: "The most common aberrant myeloid marker expressed in B‑ALL is:", options: ["CD13", "CD33", "CD117", "CD14"], ans: 0 },
+                { q: "Extramedullary infiltration in ALL is most common in:", options: ["CNS and testes", "Liver only", "Spleen only", "Kidneys"], ans: 0 }
+            ]},
+            clinical: { title: "Clinical Presentation & Diagnosis", next: "treatment", questions: [
+                { q: "Which of the following is a common presenting symptom of ALL due to anemia?", options: ["Fatigue and pallor", "Bruising", "Fever", "Bone pain"], ans: 0 },
+                { q: "Thrombocytopenia in ALL may cause:", options: ["Petechiae, easy bruising", "Pallor", "Recurrent infections", "Bone pain"], ans: 0 },
+                { q: "The most common site of extramedullary involvement in boys with ALL is:", options: ["Testes", "CNS", "Liver", "Spleen"], ans: 0 },
+                { q: "Initial diagnostic test for suspected ALL is:", options: ["CBC with peripheral smear", "Bone marrow biopsy", "Lumbar puncture", "Chest X‑ray"], ans: 0 },
+                { q: "Bone marrow aspiration for ALL diagnosis should show at least what percentage of blasts?", options: ["10%", "20%", "30%", "50%"], ans: 1 },
+                { q: "Elevated serum LDH and uric acid at diagnosis may indicate:", options: ["High tumor burden", "Low risk disease", "B‑ALL only", "No significance"], ans: 0 },
+                { q: "A child with ALL and headache, vomiting, and papilledema likely has:", options: ["CNS leukemia", "Meningitis", "Migraine", "Hydrocephalus"], ans: 0 },
+                { q: "Which of the following is NOT a typical initial finding in ALL?", options: ["Leukocytosis", "Pancytopenia", "Hypercalcemia", "Blasts on smear"], ans: 2 },
+                { q: "The gold standard for definitive diagnosis of ALL is:", options: ["Bone marrow biopsy with immunophenotyping and cytogenetics", "Peripheral blood smear only", "CBC alone", "LDH level"], ans: 0 },
+                { q: "Lumbar puncture is performed at diagnosis to:", options: ["Detect CNS involvement", "Diagnose ALL", "Rule out infection", "Measure ICP"], ans: 0 }
+            ]},
+            treatment: { title: "Treatment (Chemotherapy, CNS Prophylaxis, Transplant)", next: "nursing", questions: [
+                { q: "The first phase of chemotherapy for ALL is called:", options: ["Induction", "Consolidation", "Maintenance", "Intensification"], ans: 0 },
+                { q: "The goal of induction therapy is:", options: ["Achieve remission (<5% marrow blasts)", "Prevent CNS relapse", "Eliminate residual disease", "Long‑term maintenance"], ans: 0 },
+                { q: "CNS prophylaxis is given mainly by:", options: ["Intrathecal chemotherapy", "Oral chemotherapy", "IV chemotherapy", "Cranial irradiation alone"], ans: 0 },
+                { q: "Which drug is used to treat Philadelphia chromosome‑positive ALL?", options: ["Imatinib (tyrosine kinase inhibitor)", "Methotrexate", "Vincristine", "Asparaginase"], ans: 0 },
+                { q: "Maintenance chemotherapy for ALL typically lasts:", options: ["2‑3 weeks", "2‑3 months", "2‑3 years", "5‑6 years"], ans: 2 },
+                { q: "Allogeneic stem cell transplant is considered for:", options: ["High‑risk or relapsed ALL", "Standard‑risk ALL", "All patients", "Only infants"], ans: 0 },
+                { q: "Cranial irradiation for CNS prophylaxis is currently used:", options: ["Rarely, for high‑risk only", "Routinely for all", "First‑line for all", "Only for T‑ALL"], ans: 0 },
+                { q: "Which medication is a bispecific T‑cell engager used in relapsed ALL?", options: ["Blinatumomab", "Rituximab", "Imatinib", "Asparaginase"], ans: 0 },
+                { q: "A common drug used for tumor lysis syndrome prophylaxis is:", options: ["Allopurinol", "Methotrexate", "Vincristine", "Prednisone"], ans: 0 },
+                { q: "CAR T‑cell therapy (tisagenlecleucel) is approved for:", options: ["Relapsed/refractory B‑ALL", "Newly diagnosed ALL", "T‑ALL only", "Ph+ ALL only"], ans: 0 }
+            ]},
+            nursing: { title: "Nursing Care & Complications", next: "prognosis", questions: [
+                { q: "A child with ALL receiving chemotherapy has an absolute neutrophil count (ANC) <500. The priority nursing intervention is:", options: ["Infection prevention (reverse isolation)", "Platelet transfusion", "Pain management", "Nutritional support"], ans: 0 },
+                { q: "To prevent bleeding in a thrombocytopenic child, the nurse should:", options: ["Use soft toothbrush, avoid IM injections", "Encourage vigorous activity", "Give aspirin", "Apply ice packs only"], ans: 0 },
+                { q: "Tumor lysis syndrome is characterized by:", options: ["Hyperuricemia, hyperkalemia, hyperphosphatemia, hypocalcemia", "Hypouricemia, hypokalemia", "Normal electrolytes", "Only hyperkalemia"], ans: 0 },
+                { q: "The mnemonic 'C.A.R.E.' for nursing care includes:", options: ["Chemotherapy side effects, Assess bleeding/infection, Reduce TLS risk, Educate", "Clean, Assess, Reassure, Educate", "Chemo, Aspirate, Radiation, Empathize", "None"], ans: 0 },
+                { q: "A child on high‑dose methotrexate should receive:", options: ["Leucovorin rescue", "Folinic acid", "Both", "No rescue"], ans: 2 },
+                { q: "A child with fever and neutropenia requires:", options: ["Immediate antibiotics and blood culture", "Observation for 24 hours", "Discharge home", "Only antipyretics"], ans: 0 },
+                { q: "Mucositis prevention includes:", options: ["Good oral hygiene, ice chips, oral care protocols", "Avoid all oral intake", "Use alcohol mouthwash", "None"], ans: 0 },
+                { q: "Platelet transfusion is typically indicated when platelet count is <10,000/mm³ or active bleeding. The nurse should also monitor for:", options: ["Transfusion reaction", "Hyperkalemia", "Hypocalcemia", "All of the above"], ans: 3 },
+                { q: "A child with ALL and abdominal pain, hypertension, and seizures may have:", options: ["Vincristine neurotoxicity", "Asparaginase pancreatitis", "Cytarabine syndrome", "Methotrexate encephalopathy"], ans: 0 },
+                { q: "Psychosocial support for a child with ALL includes:", options: ["Age‑appropriate education, play therapy, school re‑entry", "Only medication", "Avoid discussing diagnosis", "Isolation from family"], ans: 0 }
+            ]},
+            prognosis: { title: "Prognosis & Long‑Term Follow‑Up", next: "flashcards", questions: [
+                { q: "Current 5‑year overall survival for childhood ALL in high‑income countries is approximately:", options: ["50%", "70%", "90‑94%", "30%"], ans: 2 },
+                { q: "Which of the following is a favorable prognostic factor?", options: ["Age 1‑9 years, WBC <50,000, hyperdiploidy", "Infant <1 year", "WBC >100,000", "Hypodiploidy"], ans: 0 },
+                { q: "Relapse occurs in approximately what percentage of children with ALL?", options: ["5%", "15‑20%", "40%", "60%"], ans: 1 },
+                { q: "Late effects of anthracycline chemotherapy include:", options: ["Cardiomyopathy", "Neurocognitive deficits", "Secondary leukemia", "Growth hormone deficiency"], ans: 0 },
+                { q: "Cranial irradiation for CNS prophylaxis is associated with increased risk of:", options: ["Secondary brain tumors", "Leukemia", "Hearing loss", "Renal failure"], ans: 0 },
+                { q: "Which of the following is an unfavorable cytogenetic feature?", options: ["Hyperdiploidy", "t(12;21)", "Hypodiploidy (<44 chromosomes)", "ETV6‑RUNX1"], ans: 2 },
+                { q: "Children with Down syndrome and ALL have a:", options: ["Higher risk of treatment‑related toxicity", "Better prognosis than others", "No difference", "Lower relapse risk"], ans: 0 },
+                { q: "A patient who achieved remission after induction but fails to clear minimal residual disease (MRD) has:", options: ["Higher relapse risk", "Favorable outcome", "No change in prognosis", "Cure guaranteed"], ans: 0 },
+                { q: "The most common cause of death during ALL treatment is:", options: ["Infection or treatment‑related toxicity", "Relapse", "Hemorrhage", "Secondary malignancy"], ans: 0 },
+                { q: "Long‑term survivorship clinics monitor for all EXCEPT:", options: ["Cardiotoxicity", "Neurocognitive function", "Acute leukemia relapse (beyond 5 years is rare)", "Endocrine dysfunction"], ans: 2 }
+            ]},
+            flashcards: { title: "Flashcards & Mnemonics", next: "final_quiz_sec", questions: [
+                { q: "The mnemonic for nursing care in ALL is:", options: ["C.A.R.E.", "A.L.L.", "F.A.B.", "N.I.H."], ans: 0 },
+                { q: "In C.A.R.E., the first 'C' stands for:", options: ["Chemotherapy side effects", "Cryotherapy", "CBC", "CNS"], ans: 0 },
+                { q: "The mnemonic for ALL diagnosis includes blasts in bone marrow >___%.", options: ["10%", "20%", "30%", "50%"], ans: 1 },
+                { q: "The mnemonic 'F.A.B.' classification is used for:", options: ["ALL morphology (L1, L2, L3)", "Risk groups", "Treatment phases", "Nursing care"], ans: 0 },
+                { q: "A flashcard for 'Ph+ ALL' answer is:", options: ["Philadelphia chromosome positive (t(9;22), BCR‑ABL1)", "Phylogenetic ALL", "Phosphatase ALL", "None"], ans: 0 },
+                { q: "A flashcard for 'CNS prophylaxis' answer is:", options: ["Intrathecal chemotherapy to prevent CNS relapse", "Cranial irradiation only", "IV methotrexate", "No prophylaxis"], ans: 0 },
+                { q: "The mnemonic 'N.I.H.' for CNS prophylaxis includes:", options: ["Non‑irradiated, Intrathecal therapy, High‑risk groups", "National Institutes of Health", "Nausea, Infection, Hemorrhage", "None"], ans: 0 },
+                { q: "A flashcard for 'hyperdiploidy' answer is:", options: ["Favorable prognosis (>50 chromosomes)", "Poor prognosis", "T‑ALL only", "Infant ALL"], ans: 0 },
+                { q: "A flashcard for 'standard risk' criteria includes:", options: ["Age 1‑9, WBC <50,000, favorable genetics", "Age <1, WBC >100,000", "Hypodiploidy", "Ph+ ALL"], ans: 0 },
+                { q: "The mnemonic for induction chemotherapy drugs often includes:", options: ["Vincristine, Steroid, Anthracycline, Asparaginase (VSAA)", "Methotrexate, Cytarabine", "Imatinib, Dasatinib", "Blinatumomab"], ans: 0 }
+            ]}
+        };
+        // Build final 50-item exam
+        let finalQ = [];
+        for(let sec of ['definition','etiology','pathophysiology','clinical','treatment','nursing','prognosis','flashcards']) {
+            finalQ.push(...quizzes[sec].questions.slice(0,6));
+        }
+        while(finalQ.length < 50) finalQ.push({ q: "The single most important factor contributing to improved survival in childhood ALL is:", options: ["Risk‑adapted therapy and CNS prophylaxis", "New antibiotics", "Surgery", "Radiotherapy alone"], ans: 0 });
+        quizzes.final_quiz = { title: "Final 50‑Item Exam: Acute Lymphocytic Leukemia in Children", next: null, questions: finalQ };
+
+        let currentQuiz = null;
+        let allChart = null;
+
+        function initAllChart() {
+            const ctx = document.getElementById('allChart')?.getContext('2d');
+            if(ctx && !allChart) {
+                allChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['ALL (B‑ALL)', 'T‑ALL', 'Childhood ALL incidence', '5‑Year survival (childhood)'],
+                        datasets: [{ label: 'Percentage', data: [90, 10, 3.3, 92], backgroundColor: '#b91c1c', borderRadius: 6 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+                });
+            }
+        }
+
+        function toggleFlash(el) { const ans = el.querySelector('.flash-answer'); if(ans) ans.classList.toggle('hidden'); }
+        function unlockFirstSection() { if(!unlockedSections.includes('definition')) { unlockedSections.push('definition'); updateSidebarUI(); } showSection('definition'); }
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') { alert("Complete the Active Recall Quiz at the bottom of the previous section to unlock."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-all-light','text-all-dark','border-r-4','border-all-dark'));
+            const activeBtn = document.getElementById('btn-'+sectionId);
+            if(activeBtn) activeBtn.classList.add('bg-all-light','text-all-dark','border-r-4','border-all-dark');
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+            if(sectionId === 'definition') setTimeout(initAllChart, 50);
+        }
+        function updateSidebarUI() {
+            const sections = ['home','definition','etiology','pathophysiology','clinical','treatment','nursing','prognosis','flashcards','final_quiz_sec'];
+            sections.forEach(sec => {
+                const btn = document.getElementById('btn-'+sec);
+                if(!btn) return;
+                const lock = btn.querySelector('.fa-lock'), icon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lock) lock.classList.add('hidden'); if(icon) icon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lock) lock.classList.remove('hidden'); if(icon) icon.classList.add('hidden'); }
+            });
+        }
+        function openQuiz(sectionId) { currentQuiz = sectionId; const qd = quizzes[sectionId]; if(!qd) return; document.getElementById('quiz-title').innerHTML = qd.title; const container = document.getElementById('quiz-questions-container'); container.innerHTML = ''; qd.questions.forEach((q, idx) => { let html = `<div class="bg-slate-50 p-4 rounded-xl mb-4"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2">`; q.options.forEach((opt,oi) => { html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-all"><span>${opt}</span></label>`; }); html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`; container.innerHTML += html; }); document.getElementById('quiz-submit-btn').classList.remove('hidden'); document.getElementById('quiz-result-container').classList.add('hidden'); document.getElementById('quiz-modal').classList.remove('hidden'); }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            const qd = quizzes[currentQuiz];
+            if(!qd) return;
+            let score = 0;
+            for(let i=0; i<qd.questions.length; i++) {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value)===qd.questions[i].ans) score++;
+                const fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv){
+                    fbDiv.classList.remove('hidden');
+                    const correctTxt = qd.questions[i].options[qd.questions[i].ans];
+                    if(sel && parseInt(sel.value)===qd.questions[i].ans) { fbDiv.innerHTML='<span class="text-green-700">✓ Correct</span>'; fbDiv.parentElement?.classList.add('quiz-feedback-correct'); }
+                    else { const selectedTxt = sel? qd.questions[i].options[parseInt(sel.value)]:"No answer"; fbDiv.innerHTML=`<span class="text-red-700">✗ Incorrect. Correct: ${correctTxt}. You answered: ${selectedTxt}</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-wrong'); }
+                }
+            }
+            let percent = (score/qd.questions.length)*100;
+            let resultDiv = document.getElementById('quiz-result-container');
+            document.getElementById('quiz-submit-btn').classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            if(percent>=75){
+                if(currentQuiz==='final_quiz'){ resultDiv.innerHTML=`<div class="text-green-600 text-4xl text-center">🎉 Excellent! Score ${score}/${qd.questions.length} (${percent}%)<br>You mastered Childhood ALL</div><button onclick="closeQuiz()" class="mt-4 bg-all text-white px-6 py-2 rounded-xl">Close</button>`; return; }
+                if(quizzes[currentQuiz].next && !unlockedSections.includes(quizzes[currentQuiz].next)) unlockedSections.push(quizzes[currentQuiz].next);
+                if(quizzes[currentQuiz].next === 'flashcards' && !unlockedSections.includes('final_quiz_sec')) unlockedSections.push('final_quiz_sec');
+                updateSidebarUI();
+                resultDiv.innerHTML=`<div class="text-green-600 text-3xl text-center">✅ Passed! (${score}/${qd.questions.length})</div><button onclick="closeQuiz(); showSection('${quizzes[currentQuiz].next}')" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl">Unlock Next Section</button>`;
+            } else { resultDiv.innerHTML=`<div class="text-red-600 text-3xl text-center">❌ Failed: ${score}/${qd.questions.length} (${percent}%)<br>Need 75%</div><button onclick="openQuiz('${currentQuiz}')" class="mt-4 bg-slate-600 text-white px-6 py-2 rounded-xl">Try Again</button>`; }
+        }
+        function toggleRecallMode() { const active = !document.body.classList.contains('recall-mode'); const toggle=document.getElementById('recall-toggle'),knob=document.getElementById('recall-knob'); if(active){ document.body.classList.add('recall-mode'); toggle.classList.add('bg-all-dark'); knob.classList.add('translate-x-6'); } else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-all-dark'); knob.classList.remove('translate-x-6'); } }
+        function toggleMobileMenu() { const s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden','flex','absolute','h-full','z-50'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', () => { updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el => el.addEventListener('click', function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); })); });
+    </script>
+</body>
+</html>
